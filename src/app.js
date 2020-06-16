@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const {uuid} = require('uuidv4')
+const {uuid, isUuid} = require('uuidv4');
+
 
 // const { uuid } = require("uuidv4");
 
@@ -14,19 +15,26 @@ app.use(cors());
 
 const repositories = [];
 
-function repositoryExists(req, res, next){
+function repositoryExists(request, response, next){
 
-  const { id } = req.params
+  const { id } = request.params
 
   const repoIndex =  repositories.findIndex(repo => repo.id === id);
 
 
-  console.log(repoIndex);
-  if(repoIndex < 0){
-    res.status(400).json({err: "Repo não existe"})
-    return;
+  if(!isUuid(id)){
+    return response.status(400).json({ error: "Uuid is not valid"})
   }
-    return next()
+
+
+  console.log(repoIndex)
+  if(repoIndex < 0){
+    return response.status(400).json({ error: "Uuid is not exists"})
+  }
+
+
+
+  return next();
   
 
 }
@@ -51,21 +59,27 @@ app.put("/repositories/:id",  repositoryExists, (request, response) => {
       const { title, url, techs} = request.body
 
 
+     
+
 
       const repoIndex = repositories.findIndex(repo => repo.id === id);
 
+      if(repoIndex  < 0) {
+        return response.status(400).json({error: "repository not found"});
+      }
 
+ 
 
       let repository = {
         title,
         url,
         techs,
         uuid: id,
-        like: repositories[repoIndex].likes
+        likes: repositories[repoIndex].likes
       }
 
       repositories[repoIndex] = repository;
-      console.log(repoIndex)
+
       response.json(repository)
 
 });
@@ -76,7 +90,7 @@ app.delete("/repositories/:id", repositoryExists, (request, response) => {
     const repoIndex = repositories.findIndex(repo => repo.id === id);
 
     repositories.splice(repoIndex, 1);
-
+    
     return response.status(204).end();
 
 });
