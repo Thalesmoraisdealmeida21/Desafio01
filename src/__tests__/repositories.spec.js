@@ -63,6 +63,8 @@ describe("Repositories", () => {
         techs: ["React", "ReactNative", "TypeScript", "ContextApi"]
       });
 
+
+      console.log(response.body.id);
     expect(isUuid(response.body.id)).toBe(true);
 
     expect(response.body).toMatchObject({

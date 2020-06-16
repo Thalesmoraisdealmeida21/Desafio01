@@ -27,7 +27,6 @@ function repositoryExists(request, response, next){
   }
 
 
-  console.log(repoIndex)
   if(repoIndex < 0){
     return response.status(400).json({ error: "Uuid is not exists"})
   }
@@ -57,6 +56,9 @@ app.post("/repositories", (request, response) => {
 app.put("/repositories/:id",  repositoryExists, (request, response) => {
       const { id } = request.params;
       const { title, url, techs} = request.body
+   
+
+  
 
 
      
@@ -64,17 +66,20 @@ app.put("/repositories/:id",  repositoryExists, (request, response) => {
 
       const repoIndex = repositories.findIndex(repo => repo.id === id);
 
-      if(repoIndex  < 0) {
-        return response.status(400).json({error: "repository not found"});
-      }
+
+      if(!isUuid){
+        return response.status(400).json({error: "repository not valid"});
+      } 
+      
 
  
-
+   
+      
       let repository = {
         title,
         url,
         techs,
-        uuid: id,
+        id: id,
         likes: repositories[repoIndex].likes
       }
 
